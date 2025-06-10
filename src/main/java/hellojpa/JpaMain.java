@@ -2,6 +2,8 @@ package hellojpa;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 public class JpaMain {
 
     public static void main(String[] args) {
@@ -12,15 +14,23 @@ public class JpaMain {
         EntityTransaction tx = em.getTransaction();
         tx.begin();
 
-        Member member = new Member();
-        member.setId(1L);
-        member.setName("HelloA");
+        try {
 
-        em.persist(member);
+//            Member findMember = em.find(Member.class, 1L);
+            List<Member> result = em.createQuery("select m from Member as m", Member.class)
+                            .setFirstResult(5)
+                            .setMaxResults(8)
+                            .getResultList();
 
-        tx.commit();
+            tx.commit();
 
-        em.close();
+        } catch(Exception e) {
+            tx.rollback();
+
+        } finally {
+            em.close();
+        }
+
         emf.close();
     }
 }
